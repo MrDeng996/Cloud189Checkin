@@ -1,0 +1,33 @@
+name: 百度网盘自动签到
+
+on:
+  schedule:
+    - cron: '17 1 * * *'   # 北京时间 09:17
+    - cron: '17 13 * * *'  # 北京时间 21:17
+  workflow_dispatch:
+
+concurrency:
+  group: baidu-pan-signin
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  signin:
+    runs-on: ubuntu-latest
+    environment: user
+    timeout-minutes: 10
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 准备 Node 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 执行签到
+        env:
+          BAIDU_COOKIE: ${{ secrets.BAIDU_COOKIE }}
+        run: node scripts/baidu-signin.js
